@@ -1,25 +1,24 @@
-import http = require("http");
-import fs = require("fs");
+import * as http from "http";
+import * as fs from "fs";
 
 const postData: http.RequestListener = (
   request: http.IncomingMessage,
   response: http.ServerResponse
 ) => {
-  if (request.method === "POST") {
-    let body = "";
-    request.on("data", (data) => {
-      body += data;
-    });
-    request.on("end", () => {
-      const preparedData = dataToUpperCase(body) + "\n";
-      fs.appendFileSync("..\\data\\data.txt", preparedData);
-    });
-    response.end("Data updated.");
-  } else {
-    response.statusCode = 403;
-    response.statusMessage = "Forbidden activity.";
+  if (request.method !== "POST") {
+    response.writeHead(403, "Forbidden activity.");
     response.end("Error 403. Forbidden activity.");
   }
+
+  let body = "";
+  request.on("data", (data) => {
+    body += data;
+  });
+  request.on("end", () => {
+    const preparedData = dataToUpperCase(body) + "\n";
+    fs.appendFileSync("../data/data.txt", preparedData);
+  });
+  response.end("Data updated.");
 };
 
 const dataToUpperCase = (data: string) => {
