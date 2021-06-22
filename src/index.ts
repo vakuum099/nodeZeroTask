@@ -1,25 +1,12 @@
 import * as http from 'http';
 import * as fs from 'fs';
-import { response404 } from './constants';
+import { Methods, Resource, response404 } from './constants';
 import { addDataToFile, changeDataInFile, deleteFile, readDataFromFile } from './utils';
 
 const requestRouter: http.RequestListener = (
   request: http.IncomingMessage,
   response: http.ServerResponse
 ) => {
-  enum Methods {
-    create = 'POST',
-    read = 'GET',
-    change = 'PUT',
-    delete = 'DELETE',
-  }
-
-  enum Resource {
-    create = 'create',
-    read = 'read',
-    change = 'change',
-    delete = 'delete',
-  }
 
   const url: string[] = String(request.url).split('/');
   const resource = url[1] as Resource; // create, read, change, delete
