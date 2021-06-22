@@ -2,33 +2,40 @@ import * as http from 'http';
 import * as fs from 'fs';
 import { response404 } from './constants';
 import { addDataToFile, changeDataInFile, deleteFile, readDataFromFile } from './utils';
-import { Resource, Services } from './interfaces';
 
 const requestRouter: http.RequestListener = (
   request: http.IncomingMessage,
   response: http.ServerResponse
 ) => {
-  const services: Services = {
-    create: 'POST',
-    read: 'GET',
-    change: 'PUT',
-    delete: 'DELETE',
-  };
+  enum Methods {
+    create = 'POST',
+    read = 'GET',
+    change = 'PUT',
+    delete = 'DELETE',
+  }
+
+  enum Resource {
+    create = 'create',
+    read = 'read',
+    change = 'change',
+    delete = 'delete',
+  }
+
   const url: string[] = String(request.url).split('/');
-  const resource = url[1] as Resource;
-  const method = request.method;
+  const resource = url[1] as Resource; // create, read, change, delete
+  const method = request.method as Methods; // POST, GET, PUT, DELETE
   const targetedFile = url[2];
 
   //Wrong URI
-  if (!services[resource]) {
+  if (!Methods[resource]) {
     response.writeHead(400, 'Bad request.');
     return response.end('Error 400. Bad request.');
   }
 
   //URI didn't match with method
-  if (method !== services[resource]) {
+  if (method !== Methods[resource]) {
     response.writeHead(405, 'Method Not Allowed', {
-      Allow: `${services[resource]}`,
+      Allow: `${Methods[resource]}`,
     });
     return response.end('Error 405. Method Not Allowed');
   }
